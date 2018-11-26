@@ -232,9 +232,6 @@ func dataSourceAlicloudImagesRead(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	var images []ecs.ImageType
-	if len(filteredImages) < 1 {
-		return fmt.Errorf("Your query returned no results[alicloud_images]. Please change your search criteria and try again.")
-	}
 
 	log.Printf("[DEBUG] alicloud_image - multiple results found and `most_recent` is set to: %t", mostRecent.(bool))
 	if len(filteredImages) > 1 && mostRecent.(bool) {
