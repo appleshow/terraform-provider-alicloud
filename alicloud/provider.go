@@ -1,0 +1,243 @@
+package alicloud
+
+import (
+	"os"
+
+	"github.com/denverdino/aliyungo/common"
+	"github.com/hashicorp/terraform/helper/mutexkv"
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/terraform"
+)
+
+// Provider returns a schema.Provider for alicloud
+func Provider() terraform.ResourceProvider {
+	return &schema.Provider{
+		Schema: map[string]*schema.Schema{
+			"access_key": &schema.Schema{
+				Type:        schema.TypeString,
+				Required:    true,
+				DefaultFunc: schema.EnvDefaultFunc("ALICLOUD_ACCESS_KEY", os.Getenv("ALICLOUD_ACCESS_KEY")),
+				Description: descriptions["access_key"],
+			},
+			"secret_key": &schema.Schema{
+				Type:        schema.TypeString,
+				Required:    true,
+				DefaultFunc: schema.EnvDefaultFunc("ALICLOUD_SECRET_KEY", os.Getenv("ALICLOUD_SECRET_KEY")),
+				Description: descriptions["secret_key"],
+			},
+			"region": &schema.Schema{
+				Type:        schema.TypeString,
+				Required:    true,
+				DefaultFunc: schema.EnvDefaultFunc("ALICLOUD_REGION", os.Getenv("ALICLOUD_REGION")),
+				Description: descriptions["region"],
+			},
+			"security_token": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("ALICLOUD_SECURITY_TOKEN", os.Getenv("SECURITY_TOKEN")),
+				Description: descriptions["security_token"],
+			},
+			"ots_instance_name": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("OTS_INSTANCE_NAME", os.Getenv("OTS_INSTANCE_NAME")),
+				Description: descriptions["ots_instance_name"],
+			},
+			"user_id": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("ALICLOUD_USER_ID", os.Getenv("ALICLOUD_USER_ID")),
+				Description: descriptions["user_id"],
+			},
+			// AliCloud API version for Function compute
+			"api_version_fc": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("API_VERSION_FC", os.Getenv("API_VERSION_FC")),
+				Description: descriptions["api_version_fc"],
+			},
+		},
+		DataSourcesMap: map[string]*schema.Resource{
+			"alicloud_images":         dataSourceAlicloudImages(),
+			"alicloud_regions":        dataSourceAlicloudRegions(),
+			"alicloud_zones":          dataSourceAlicloudZones(),
+			"alicloud_instance_types": dataSourceAlicloudInstanceTypes(),
+			"alicloud_instances":      dataSourceAlicloudInstances(),
+			"alicloud_vpcs":           dataSourceAlicloudVpcs(),
+			"alicloud_vswitches":      dataSourceAlicloudVSwitches(),
+			"alicloud_eips":           dataSourceAlicloudEips(),
+			"alicloud_key_pairs":      dataSourceAlicloudKeyPairs(),
+			"alicloud_kms_keys":       dataSourceAlicloudKmsKeys(),
+			"alicloud_dns_domains":    dataSourceAlicloudDnsDomains(),
+			"alicloud_dns_groups":     dataSourceAlicloudDnsGroups(),
+			"alicloud_dns_records":    dataSourceAlicloudDnsRecords(),
+			// alicloud_dns_domain_groups, alicloud_dns_domain_records have been deprecated.
+			"alicloud_dns_domain_groups":  dataSourceAlicloudDnsGroups(),
+			"alicloud_dns_domain_records": dataSourceAlicloudDnsRecords(),
+			// alicloud_ram_account_alias has been deprecated
+			"alicloud_ram_account_alias":       dataSourceAlicloudRamAccountAlias(),
+			"alicloud_ram_account_aliases":     dataSourceAlicloudRamAccountAlias(),
+			"alicloud_ram_groups":              dataSourceAlicloudRamGroups(),
+			"alicloud_ram_users":               dataSourceAlicloudRamUsers(),
+			"alicloud_ram_roles":               dataSourceAlicloudRamRoles(),
+			"alicloud_ram_policies":            dataSourceAlicloudRamPolicies(),
+			"alicloud_security_groups":         dataSourceAlicloudSecurityGroups(),
+			"alicloud_security_group_rules":    dataSourceAlicloudSecurityGroupRules(),
+			"alicloud_db_instances":            dataSourceAlicloudDBInstances(),
+			"alicloud_auto_snapshot_policies":  dataSourceAlicloudAutoSnapshotPolicies(),
+			"alicloud_fc_services":             dataSourceAlicloudFcServices(),
+			"alicloud_fc_functions":            dataSourceAlicloudFcFunctions(),
+			"alicloud_fc_triggers":             dataSourceAlicloudFcTriggers(),
+			"alicloud_fc_invokes":              dataSourceAlicloudFcInvokes(),
+			"alicloud_log_projects":            dataSourceAlicloudLogProjects(),
+			"alicloud_log_stores":              dataSourceAlicloudLogStores(),
+			"alicloud_log_configs":             dataSourceAlicloudLogConfigs(),
+			"alicloud_log_machinegroups":       dataSourceAlicloudLogMachineGroups(),
+			"alicloud_cms_alarms":              dataSourceAlicloudCmsAlarms(),
+			"alicloud_cms_contact_groups":      dataSourceAlicloudCmsContactGroups(),
+			"alicloud_router_interfaces":       dataSourceAlicloudRouterInterfaces(),
+			"alicloud_commands":                dataSourceAlicloudCommands(),
+			"alicloud_command_invokes":         dataSourceAlicloudCommandInvokes(),
+			"alicloud_command_invoke_results":  dataSourceAlicloudCommandInvokeResults(),
+			"alicloud_cms_app_groups":          dataSourceAlicloudCmsAppGroups(),
+			"alicloud_base_encode":             dataSourceAlicloudBaseEncode(),
+			"alicloud_disks":                   dataSourceAlicloudDisks(),
+			"alicloud_image_share_permissions": dataSourceAlicloudImageSharePermissions(),
+			"alicloud_dummy_resource":          dataSourceAlicloudDummyResource(),
+			"alicloud_dummy_parameters":        dataSourceAlicloudDummyParameters(),
+		},
+		ResourcesMap: map[string]*schema.Resource{
+			"alicloud_instance":                  resourceAliyunInstance(),
+			"alicloud_ram_role_attachment":       resourceAlicloudRamRoleAttachment(),
+			"alicloud_disk":                      resourceAliyunDisk(),
+			"alicloud_disk_attachment":           resourceAliyunDiskAttachment(),
+			"alicloud_security_group":            resourceAliyunSecurityGroup(),
+			"alicloud_security_group_rule":       resourceAliyunSecurityGroupRule(),
+			"alicloud_db_database":               resourceAlicloudDBDatabase(),
+			"alicloud_db_account":                resourceAlicloudDBAccount(),
+			"alicloud_db_account_privilege":      resourceAlicloudDBAccountPrivilege(),
+			"alicloud_db_backup_policy":          resourceAlicloudDBBackupPolicy(),
+			"alicloud_db_connection":             resourceAlicloudDBConnection(),
+			"alicloud_db_instance":               resourceAlicloudDBInstance(),
+			"alicloud_ess_scaling_group":         resourceAlicloudEssScalingGroup(),
+			"alicloud_ess_scaling_configuration": resourceAlicloudEssScalingConfiguration(),
+			"alicloud_ess_scaling_rule":          resourceAlicloudEssScalingRule(),
+			"alicloud_ess_schedule":              resourceAlicloudEssSchedule(),
+			"alicloud_ess_attachment":            resourceAlicloudEssAttachment(),
+			"alicloud_vpc":                       resourceAliyunVpc(),
+			"alicloud_nat_gateway":               resourceAliyunNatGateway(),
+			// "alicloud_subnet" aims to match aws usage habit.
+			"alicloud_subnet":              resourceAliyunSubnet(),
+			"alicloud_vswitch":             resourceAliyunSubnet(),
+			"alicloud_route_entry":         resourceAliyunRouteEntry(),
+			"alicloud_snat_entry":          resourceAliyunSnatEntry(),
+			"alicloud_forward_entry":       resourceAliyunForwardEntry(),
+			"alicloud_eip":                 resourceAliyunEip(),
+			"alicloud_eip_association":     resourceAliyunEipAssociation(),
+			"alicloud_slb":                 resourceAliyunSlb(),
+			"alicloud_slb_listener":        resourceAliyunSlbListener(),
+			"alicloud_slb_attachment":      resourceAliyunSlbAttachment(),
+			"alicloud_slb_server_group":    resourceAliyunSlbServerGroup(),
+			"alicloud_slb_rule":            resourceAliyunSlbRule(),
+			"alicloud_oss_bucket":          resourceAlicloudOssBucket(),
+			"alicloud_oss_bucket_object":   resourceAlicloudOssBucketObject(),
+			"alicloud_dns_record":          resourceAlicloudDnsRecord(),
+			"alicloud_dns":                 resourceAlicloudDns(),
+			"alicloud_dns_group":           resourceAlicloudDnsGroup(),
+			"alicloud_key_pair":            resourceAlicloudKeyPair(),
+			"alicloud_key_pair_attachment": resourceAlicloudKeyPairAttachment(),
+			"alicloud_kms_key":             resourceAlicloudKmsKey(),
+			"alicloud_ram_user":            resourceAlicloudRamUser(),
+			"alicloud_ram_access_key":      resourceAlicloudRamAccessKey(),
+			"alicloud_ram_login_profile":   resourceAlicloudRamLoginProfile(),
+			"alicloud_ram_group":           resourceAlicloudRamGroup(),
+			"alicloud_ram_role":            resourceAlicloudRamRole(),
+			"alicloud_ram_policy":          resourceAlicloudRamPolicy(),
+			// alicloud_ram_alias has been deprecated
+			"alicloud_ram_alias":                        resourceAlicloudRamAccountAlias(),
+			"alicloud_ram_account_alias":                resourceAlicloudRamAccountAlias(),
+			"alicloud_ram_group_membership":             resourceAlicloudRamGroupMembership(),
+			"alicloud_ram_user_policy_attachment":       resourceAlicloudRamUserPolicyAtatchment(),
+			"alicloud_ram_role_policy_attachment":       resourceAlicloudRamRolePolicyAttachment(),
+			"alicloud_ram_group_policy_attachment":      resourceAlicloudRamGroupPolicyAtatchment(),
+			"alicloud_container_cluster":                resourceAlicloudCSSwarm(),
+			"alicloud_cs_application":                   resourceAlicloudCSApplication(),
+			"alicloud_cs_swarm":                         resourceAlicloudCSSwarm(),
+			"alicloud_cs_kubernetes":                    resourceAlicloudCSKubernetes(),
+			"alicloud_cdn_domain":                       resourceAlicloudCdnDomain(),
+			"alicloud_router_interface":                 resourceAlicloudRouterInterface(),
+			"alicloud_router_interface_connect":         resourceAlicloudRouterInterfaceConnect(),
+			"alicloud_ots_table":                        resourceAlicloudOtsTable(),
+			"alicloud_cms_alarm":                        resourceAlicloudCmsAlarm(),
+			"alicloud_fc_service":                       resourceAlicloudFcService(),
+			"alicloud_fc_function":                      resourceAlicloudFcFunction(),
+			"alicloud_auto_snapshot_policy":             resourceAlicloudAutoSnapshotPolicy(),
+			"alicloud_auto_snapshot_policy_application": resourceAlicloudAutoSnapshotPolicyApplication(),
+			"alicloud_fc_trigger":                       resourceAlicloudFcTrigger(),
+			"alicloud_log_project":                      resourceAlicloudLogProject(),
+			"alicloud_log_store":                        resourceAlicloudLogStore(),
+			"alicloud_log_config":                       resourceAlicloudLogConfig(),
+			"alicloud_log_machinegroup":                 resourceAlicloudLogMachineGroup(),
+			"alicloud_log_configtomachinegroup":         resourceAlicloudLogConfigToMachineGroup(),
+			"alicloud_log_storeindex":                   resourceAlicloudLogStoreIndex(),
+			"alicloud_command":                          resourceAlicloudCommand(),
+			"alicloud_command_invoke":                   resourceAlicloudCommandInvoke(),
+			"alicloud_cms_app_group":                    resourceAlicloudCmsAppGroup(),
+			"alicloud_image_share_permission":           resourceAlicloudImageSharePermission(),
+			"alicloud_action_trial":                     resourceAlicloudActionTrial(),
+			"alicloud_image":                            resourceAlicloudImage(),
+		},
+
+		ConfigureFunc: providerConfigure,
+	}
+}
+
+func providerConfigure(d *schema.ResourceData) (interface{}, error) {
+	region, ok := d.GetOk("region")
+	if !ok {
+		if region == "" {
+			region = DEFAULT_REGION
+		}
+	}
+
+	config := Config{
+		AccessKey:       d.Get("access_key").(string),
+		SecretKey:       d.Get("secret_key").(string),
+		Region:          common.Region(region.(string)),
+		RegionId:        region.(string),
+		OtsInstanceName: d.Get("ots_instance_name").(string),
+		UserId:          d.Get("user_id").(string),
+		ApiVersionFC:    d.Get("api_version_fc").(string), // AliCloud API version for Function compute,
+	}
+
+	if token, ok := d.GetOk("security_token"); ok && token.(string) != "" {
+		config.SecurityToken = token.(string)
+	}
+
+	if ots_instance_name, ok := d.GetOk("ots_instance_name"); ok && ots_instance_name.(string) != "" {
+		config.OtsInstanceName = ots_instance_name.(string)
+	}
+
+	client, err := config.Client()
+	if err != nil {
+		return nil, err
+	}
+
+	return client, nil
+}
+
+// This is a global MutexKV for use within this plugin.
+var alicloudMutexKV = mutexkv.NewMutexKV()
+
+var descriptions map[string]string
+
+func init() {
+	descriptions = map[string]string{
+		"access_key":     "Access key of alicloud",
+		"secret_key":     "Secret key of alicloud",
+		"region":         "Region of alicloud",
+		"security_token": "Alibaba Cloud Security Token",
+		"user_id":        "User Id",
+		"api_version_fc": "API version for Function compute", // AliCloud API version
+	}
+}
