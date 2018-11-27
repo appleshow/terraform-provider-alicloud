@@ -157,7 +157,7 @@ func securityGroupsDescription(d *schema.ResourceData, sg []SecurityGroup) error
 	var s []map[string]interface{}
 	//var exist bool
 
-	exist = false
+	//exist = false
 	for _, item := range sg {
 		//exist = true
 		mapping := map[string]interface{}{
