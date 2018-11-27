@@ -155,11 +155,11 @@ func dataSourceAlicloudSecurityGroupsRead(d *schema.ResourceData, meta interface
 func securityGroupsDescription(d *schema.ResourceData, sg []SecurityGroup) error {
 	var ids []string
 	var s []map[string]interface{}
-	var exist bool
+	//var exist bool
 
 	exist = false
 	for _, item := range sg {
-		exist = true
+		//exist = true
 		mapping := map[string]interface{}{
 			"id":            item.Attributes.SecurityGroupId,
 			"name":          item.Attributes.SecurityGroupName,
