@@ -166,9 +166,11 @@ func dataSourceAlicloudVSwitchesRead(d *schema.ResourceData, meta interface{}) e
 		args.PageNumber = args.PageNumber + requests.NewInteger(1)
 	}
 
-	if len(allVSwitches) < 1 {
-		return fmt.Errorf("Your query returned no results. Please change your search criteria and try again.")
-	}
+	/*
+		if len(allVSwitches) < 1 {
+			return fmt.Errorf("Your query returned no results[alicloud_vswitches]. Please change your search criteria and try again.")
+		}
+	*/
 
 	log.Printf("[DEBUG] alicloud_vswitches - VSwitches found: %#v", allVSwitches)
 

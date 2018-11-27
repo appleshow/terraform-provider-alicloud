@@ -176,9 +176,11 @@ func securityGroupsDescription(d *schema.ResourceData, sg []SecurityGroup) error
 		s = append(s, mapping)
 	}
 
-	if !exist {
-		return fmt.Errorf("Your query returned no results[alicloud_security_groups]. Please change your search criteria and try again.")
-	}
+	/*
+		if !exist {
+			return fmt.Errorf("Your query returned no results[alicloud_security_groups]. Please change your search criteria and try again.")
+		}
+	*/
 
 	d.SetId(dataResourceIdHash(ids))
 	if err := d.Set("alicloud_security_groups", s); err != nil {

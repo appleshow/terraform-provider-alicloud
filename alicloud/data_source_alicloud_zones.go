@@ -172,9 +172,12 @@ func dataSourceAlicloudZonesRead(d *schema.ResourceData, meta interface{}) error
 		return fmt.Errorf("DescribeZones got an error: %#v", err)
 	}
 
-	if zones == nil || len(zones) < 1 {
-		return fmt.Errorf("There are no availability zones in the region: %#v.", getRegion(d, meta))
-	}
+	/*
+		if zones == nil || len(zones) < 1 {
+			return fmt.Errorf("There are no availability zones in the region: %#v.", getRegion(d, meta))
+		}
+	*/
+
 	mapZones := make(map[string]ecs.ZoneType)
 	insType, _ := d.Get("available_instance_type").(string)
 	diskType, _ := d.Get("available_disk_category").(string)

@@ -235,9 +235,11 @@ func dataSourceAlicloudInstanceTypesRead(d *schema.ResourceData, meta interface{
 		instanceTypes = append(instanceTypes, types)
 	}
 
-	if len(instanceTypes) < 1 {
-		return fmt.Errorf("Your query returned no results. Please change your search criteria and try again.")
-	}
+	/*
+		if len(instanceTypes) < 1 {
+			return fmt.Errorf("Your query returned no results[alicloud_instance_types]. Please change your search criteria and try again.")
+		}
+	*/
 
 	return instanceTypesDescriptionAttributes(d, instanceTypes, mapInstanceTypes)
 }

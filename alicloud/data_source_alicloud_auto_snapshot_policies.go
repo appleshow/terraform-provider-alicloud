@@ -97,9 +97,11 @@ func dataSourceAlicloudAutoSnapshotPoliciesRead(d *schema.ResourceData, meta int
 
 	log.Printf("[DEBUG] DescribeAutoSnapshotPolicyEx for instance: %#v", auto_snapshot_policies)
 
-	if len(auto_snapshot_policies) < 1 {
-		return fmt.Errorf("Your query returned no results[auto_snapshot_policies]. Please change your search criteria and try again.")
-	}
+	/*
+		if len(auto_snapshot_policies) < 1 {
+			return fmt.Errorf("Your query returned no results[auto_snapshot_policies]. Please change your search criteria and try again.")
+		}
+	*/
 
 	log.Printf("[DEBUG] auto_snapshot_policies found: %#v", auto_snapshot_policies)
 

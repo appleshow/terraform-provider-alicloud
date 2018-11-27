@@ -279,9 +279,11 @@ func dataSourceAlicloudInstancesRead(d *schema.ResourceData, meta interface{}) e
 		filteredInstancesTemp = allInstances
 	}
 
-	if len(filteredInstancesTemp) < 1 {
-		return fmt.Errorf("Your query returned no results. Please change your search criteria and try again.")
-	}
+	/*
+		if len(filteredInstancesTemp) < 1 {
+			return fmt.Errorf("Your query returned no results[alicloud_instances]. Please change your search criteria and try again.")
+		}
+	*/
 
 	log.Printf("[DEBUG] alicloud_instances - Instances found: %#v", filteredInstancesTemp)
 

@@ -117,9 +117,12 @@ func dataSourceAlicloudRegionsRead(d *schema.ResourceData, meta interface{}) err
 		}
 		filterRegions = append(filterRegions, region)
 	}
-	if len(filterRegions) < 1 {
-		return fmt.Errorf("Your query region returned no results. Please change your search criteria and try again.")
-	}
+
+	/*
+		if len(filterRegions) < 1 {
+			return fmt.Errorf("Your query region returned no results[alicloud_regions]. Please change your search criteria and try again.")
+		}
+	*/
 
 	return regionsDescriptionAttributes(d, filterRegions)
 }

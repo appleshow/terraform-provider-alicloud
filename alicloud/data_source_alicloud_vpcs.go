@@ -196,9 +196,11 @@ func dataSourceAlicloudVpcsRead(d *schema.ResourceData, meta interface{}) error 
 		filteredVpcs = filteredVpcsTemp[:]
 	}
 
-	if len(filteredVpcs) < 1 {
-		return fmt.Errorf("Your query returned no results. Please change your search criteria and try again.")
-	}
+	/*
+		if len(filteredVpcs) < 1 {
+			return fmt.Errorf("Your query returned no results[alicloud_vpcs]. Please change your search criteria and try again.")
+		}
+	*/
 
 	log.Printf("[DEBUG] alicloud_vpc - VPCs found: %#v", allVpcs)
 
