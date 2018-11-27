@@ -1,7 +1,6 @@
 package alicloud
 
 import (
-	"fmt"
 	"sort"
 	"strconv"
 	"strings"
